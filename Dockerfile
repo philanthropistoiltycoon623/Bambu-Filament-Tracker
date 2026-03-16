@@ -13,8 +13,9 @@ COPY config.example.py .
 RUN useradd -m -u 1000 app
 
 ENV FILAMENT_TRACKER_DATA_DIR=/app/data
-RUN mkdir -p /app/data && chown app:app /app/data
+RUN mkdir -p /app/data /app/config && chown app:app /app/data /app/config
 VOLUME /app/data
+VOLUME /app/config
 
 USER app
 

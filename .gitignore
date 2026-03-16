@@ -1,5 +1,6 @@
 # Credentials & secrets
 config.py
+config/config.py
 firebase-service-account.json
 AuthKey_*.p8
 *.log

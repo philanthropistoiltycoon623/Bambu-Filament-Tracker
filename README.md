@@ -22,7 +22,7 @@ Bambu Printer ──MQTT──> Filament Tracker (Python) ──> Web UI (http:/
 4. A **web dashboard** shows current AMS status, full spool inventory, usage charts, and low-stock alerts
 
 ## Docker
-docker run -d -p 5000:5000 -v ./config.py:/app/config.py ebteam/filament-tracker
+docker run -d -p 5000:5000 -v ./config:/app/config ebteam/filament-tracker
 
 ## Features
 
@@ -52,21 +52,22 @@ Pull the pre-built image from [Docker Hub](https://hub.docker.com/r/ebteam/filam
 
 ```bash
 # Download the example config and fill in your Bambu credentials
+mkdir -p config
 curl -O https://raw.githubusercontent.com/EBTEAM3/Bambu-Filament-Tracker/main/config.example.py
-cp config.example.py config.py
-nano config.py  # fill in your Bambu credentials
+cp config.example.py config/config.py
+nano config/config.py  # fill in your Bambu credentials
 
 # Run from Docker Hub
 docker run -d \
   --name filament-tracker \
   --restart unless-stopped \
   -p 5000:5000 \
-  -v "$(pwd)/config.py:/app/config.py" \
+  -v "$(pwd)/config:/app/config" \
   -v filament-tracker-db:/app/data \
   ebteam/filament-tracker
 ```
 
-> **Windows PowerShell**: Replace `$(pwd)` with `${PWD}` or use the full path to `config.py`.
+> **Windows PowerShell**: Replace `$(pwd)` with `${PWD}` or use the full path to the `config` directory.
 
 The database is stored in a Docker volume so it persists across container restarts.
 
@@ -82,8 +83,9 @@ cd FilamentTracker
 pip3 install -r requirements.txt
 
 # Create your config
-cp config.example.py config.py
-nano config.py  # fill in your Bambu credentials
+mkdir -p config
+cp config.example.py config/config.py
+nano config/config.py  # fill in your Bambu credentials
 ```
 
 ### Finding Your Bambu Credentials
@@ -224,7 +226,8 @@ FilamentTracker/
 ├── bambu_mqtt.py             # Shared MQTT module (printer state + callbacks)
 ├── get_credentials.py        # Bambu credential helper
 ├── config.example.py         # Configuration template
-├── config.py                 # Your config (NOT in repo)
+├── config/
+│   └── config.py             # Your config (NOT in repo, Docker: /app/config/)
 ├── requirements.txt          # Python dependencies
 ├── Dockerfile                # Docker container build
 ├── .dockerignore             # Files excluded from Docker image
@@ -241,7 +244,7 @@ FilamentTracker/
 
 | Problem | Solution |
 |---------|----------|
-| "config.py not found!" | Copy `config.example.py` to `config.py` and fill in your values |
+| "config.py not found!" | Copy `config.example.py` to `config/config.py` and fill in your values (Docker: mount a directory to `/app/config/`) |
 | "No module named 'flask'" | Run `pip3 install -r requirements.txt` |
 | Port 5000 blocked | Change `FILAMENT_TRACKER_PORT` in config.py (try 5001) |
 | MQTT connection failed | Check your Bambu credentials. Ensure port 8883 is not blocked |
@@ -250,7 +253,7 @@ FilamentTracker/
 
 ## Security Notes
 
-- `config.py` and `filament_tracker.db` are `.gitignore`'d and never committed
+- `config.py` / `config/config.py` and `filament_tracker.db` are `.gitignore`'d and never committed
 - Never share your Bambu access token — it grants full access to your printer
 - The web UI has no authentication — it's designed for trusted local networks only
 

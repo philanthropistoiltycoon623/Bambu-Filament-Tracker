@@ -1,8 +1,8 @@
 # =============================================================================
 # CONFIGURATION TEMPLATE
 # =============================================================================
-# Copy this file to config.py and fill in your values:
-#   cp config.example.py config.py
+# Copy this file to config/config.py and fill in your values:
+#   mkdir -p config && cp config.example.py config/config.py
 #
 # This config file is compatible with both Bambu Progress Notification and FilamentTracker.
 # You can copy config.py between the two projects — each will use what it

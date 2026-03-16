@@ -801,12 +801,24 @@ def main():
         # ----- Live mode: connect to Bambu MQTT -----
         from bambu_mqtt import BambuMQTTClient
 
+        # Look for config.py in /app/config/ directory first (Docker volume mount),
+        # then fall back to the current working directory (manual installs).
+        _config_dirs = [
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config'),  # ./config/
+            '/app/config',  # Docker absolute path
+        ]
+        for _cd in _config_dirs:
+            if os.path.isfile(os.path.join(_cd, 'config.py')):
+                sys.path.insert(0, _cd)
+                break
+
         try:
             import config as _cfg
         except ImportError:
             print("ERROR: config.py not found!")
             print("Copy config.example.py to config.py and fill in your values:")
             print("  cp config.example.py config.py")
+            print("  (Docker users: mount a config directory to /app/config/)")
             sys.exit(1)
 
         # MQTT settings (required)

